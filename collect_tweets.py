@@ -1,13 +1,13 @@
 import tweepy
 import json
 
-API_KEY = "kDbeg6E2u7DCUJy9IC4q4gNAQ"
-API_SECRET = "48bKyKKDxg2In7VFJTY6bH6g73YunJD5fQ8nDofsE6suyX1TJQ"
-BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAJl90QEAAAAAVVx8NT1v9GcGy5odeZiFlPpJ1uc%3DQhSprJOMbdu0qJM72mfmnqHbGGk41sGoZANg8tJUQTVGZNBsmm"
+API_KEY = "0dDtkoya6TylruN2PSF4FMjZK"
+API_SECRET = "7J2TfvvCeHEkrEy6IMjuyV4BeIlOoRbloKFCp26gXVbJoH6sNl"
+BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAANSQ0QEAAAAA732rSVcyLm1A%2Bh3hDu9WE%2BkF5co%3DuJHqKYpkxLwsibQ2XoA1utcPhmdTyWkhpiOX5BrE3feavlKseo"
 
 client = tweepy.Client(bearer_token=BEARER_TOKEN)
 
-query = "Israel bombing Gaza -is:retweet lang:en"
+query = "Gaza is dying -is:retweet lang:en"
 
 response = client.search_recent_tweets(
     query=query,
@@ -28,7 +28,7 @@ for tweet in response.data:
     })
 
 # 💾 Sauvegarde du fichier
-with open("MB03.json", "w", encoding="utf-8") as f:
+with open("MB05.json", "w", encoding="utf-8") as f:
     json.dump(tweets_data, f, indent=4, ensure_ascii=False)
 
-print("✅ Fichier MB03.json généré avec succès.")
+print("✅ Fichier MB05.json généré avec succès.")

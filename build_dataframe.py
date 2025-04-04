@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 # 📁 Liste des fichiers JSON
-files = ["MB01.json", "MB02.json", "MB03.json"]
+files = ["MB01.json", "MB02.json", "MB03.json" , "MB04.json", "MB05.json"]
 
 # 📦 Liste pour stocker tous les tweets
 all_tweets = []

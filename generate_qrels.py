@@ -1,7 +1,7 @@
 import json
 import os
 
-topics = ["MB01", "MB02", "MB03"]
+topics = ["MB01", "MB02", "MB03" , "MB04", "MB05"]
 qrels = []
 
 for topic in topics:
