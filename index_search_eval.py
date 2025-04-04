@@ -9,7 +9,7 @@ if not pt.java.started():
 
 # 📄 Charger les fichiers JSON (MB01 à MB03)
 corpus = []
-for file in ["MB01.json", "MB02.json", "MB03.json"]:
+for file in ["MB01.json", "MB02.json", "MB03.json" , "MB04.json" , "MB05.json"]:
     with open(file, "r", encoding="utf-8") as f:
         tweets = json.load(f)
         for tweet in tweets:
@@ -29,7 +29,9 @@ index_ref = indexer.index(df.to_dict(orient="records"))
 topics = pd.DataFrame([
     {"qid": "MB01", "query": "Gaza children killed"},
     {"qid": "MB02", "query": "Ceasefire Gaza"},
-    {"qid": "MB03", "query": "Israel bombing Gaza"}
+    {"qid": "MB03", "query": "Israel bombing Gaza"},
+    {"qid": "MB04", "query": "Gaza genocide"},
+    {"qid": "MB05", "query": "Gaza is dying"}
 ])
 
 # 📥 Charger les jugements de pertinence
