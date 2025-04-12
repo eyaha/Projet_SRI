@@ -3,13 +3,11 @@ import pandas as pd
 import json
 from pyterrier.measures import MAP, P, Rprec
 
-# ✅ Initialisation PyTerrier
 if not pt.java.started():
     pt.java.init()
 
-# 📄 Charger les fichiers JSON (MB01 à MB03)
 corpus = []
-for file in ["MB01.json", "MB02.json", "MB03.json" , "MB04.json" , "MB05.json"]:
+for file in ["MB46.json", "MB47.json", "MB48.json", "MB49.json", "MB50.json"]:
     with open(file, "r", encoding="utf-8") as f:
         tweets = json.load(f)
         for tweet in tweets:
@@ -27,11 +25,11 @@ index_ref = indexer.index(df.to_dict(orient="records"))
 
 # 🔍 Définir les requêtes
 topics = pd.DataFrame([
-    {"qid": "MB01", "query": "Gaza children killed"},
-    {"qid": "MB02", "query": "Ceasefire Gaza"},
-    {"qid": "MB03", "query": "Israel bombing Gaza"},
-    {"qid": "MB04", "query": "Gaza genocide"},
-    {"qid": "MB05", "query": "Gaza is dying"}
+    {"qid": "MB46", "query": "Gaza children killed"},
+    {"qid": "MB47", "query": "Ceasefire Gaza"},
+    {"qid": "MB48", "query": "Israel bombing Gaza"},
+    {"qid": "MB49", "query": "Gaza genocide"},
+    {"qid": "MB50", "query": "Gaza is dying"}
 ])
 
 # 📥 Charger les jugements de pertinence

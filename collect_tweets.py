@@ -28,7 +28,7 @@ for tweet in response.data:
     })
 
 # 💾 Sauvegarde du fichier
-with open("MB05.json", "w", encoding="utf-8") as f:
+with open("MB50.json", "w", encoding="utf-8") as f:
     json.dump(tweets_data, f, indent=4, ensure_ascii=False)
 
 print("✅ Fichier MB05.json généré avec succès.")
