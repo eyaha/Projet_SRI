@@ -1,0 +1,20 @@
+<top>
+<num> MB46 </num>
+<title> Gaza children killed </title>
+</top> 
+<top> 
+ <num>MB47</num>
+ <title> Ceasefire Gaza   </title>  
+</top>
+<top> 
+ <num>MB48</num>
+ <title> Israel bombing Gaza </title>  
+</top>
+<top> 
+ <num>MB49</num>
+ <title> Gaza genocide </title>  
+</top>
+<top> 
+ <num>MB50</num>
+ <title> Gaza is dying </title>  
+</top>              
