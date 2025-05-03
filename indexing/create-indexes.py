@@ -1,40 +1,51 @@
 import pyterrier as pt
 if not pt.started():
     pt.init()
-
 import pandas as pd
 import os
-from pyterrier.measures import MAP, P, Rprecision
+import json
+from pyterrier.measures import MAP, P
+from pyterrier import terrier
 
-# ---------------------- Étape 1 : Charger le corpus ----------------------
-corpus = []
-for i in range(1, 61):
-    with open(f"MB{i:02}.json", "r", encoding="utf-8") as f:
-        tweets = json.load(f)
-        for tweet in tweets:
-            corpus.append({"docno": tweet["id"], "text": tweet["text"]})
+with open("tweets.json", "r", encoding="utf-8") as f:
+    tweets = json.load(f)
+
+corpus = [{"docno": tweet["id"], "text": tweet["text"]} for tweet in tweets]
 tweets_df = pd.DataFrame(corpus)
 
-# ---------------------- Étape 2 : Indexation ----------------------
-os.makedirs("indices", exist_ok=True)
+# Ensure all index directories exist and are valid
+os.makedirs("/content/indices/lex", exist_ok=True)
+os.makedirs("/content/indices/stem", exist_ok=True)
+os.makedirs("/content/indices/lemma", exist_ok=True)
 
-indexer_lex = pt.IterDictIndexer("indices/lex", overwrite=True)
+# Index without stemming
+indexer_lex = pt.IterDictIndexer("/content/indices/lex", overwrite=True)
 index_lex = indexer_lex.index(tweets_df.to_dict(orient="records"))
 
-indexer_stem = pt.IterDictIndexer("indices/stem", overwrite=True)
-index_stem = indexer_stem.index(tweets_df.to_dict(orient="records"), stemmer="porter")
+# Index with stemming
+indexer_stem = pt.IterDictIndexer("/content/indices/stem", overwrite=True, stemmer="porter")
+index_stem = indexer_stem.index(tweets_df.to_dict(orient="records"))
 
+# Index with lemmatization
 import spacy
 nlp = spacy.load("en_core_web_sm")
 tweets_df["text_lemma"] = tweets_df["text"].apply(lambda t: " ".join([token.lemma_ for token in nlp(t)]))
-indexer_lemma = pt.IterDictIndexer("indices/lemma", overwrite=True)
-index_lemma = indexer_lemma.index(tweets_df[["docno", "text_lemma"]].rename(columns={"text_lemma": "text"}).to_dict(orient="records"))
 
-# ---------------------- Étape 3 : Topics & Qrels ----------------------
-topics = pt.io.read_topics("topics_MB01-60.xml", format="trec-xml")
-qrels = pt.io.read_qrels("qrels_MB01-60.txt")
+indexer_lemma = pt.IterDictIndexer("/content/indices/lemma", overwrite=True)
+index_lemma = indexer_lemma.index(
+    tweets_df[["docno", "text_lemma"]].rename(columns={"text_lemma": "text"}).to_dict(orient="records")
+)
 
-# ---------------------- Étape 4 : Recherche ----------------------
+topics = pt.io.read_topics("topics.xml", format="trec")
+qrels   = pt.io.read_qrels("qrels.txt")
+
+topics["qid"] = topics["qid"].str.strip()
+qrels["qid"]  = qrels["qid"].str.strip()
+
+print("Topics QIDs:", sorted(topics["qid"].unique()))
+print("Qrels  QIDs:", sorted(qrels["qid"].unique()))
+
+
 models = {
     "bm25_lex": pt.BatchRetrieve(index_lex, wmodel="BM25"),
     "tfidf_lex": pt.BatchRetrieve(index_lex, wmodel="TF_IDF"),
@@ -44,25 +55,38 @@ models = {
     "pl2_lemma": pt.BatchRetrieve(index_lemma, wmodel="PL2"),
 }
 
-# ---------------------- Étape 5 : Évaluation ----------------------
 results = {}
 for name, model in models.items():
     res = pt.Experiment(
         [model],
         topics,
         qrels,
-        eval_measures=[MAP, P@1, P@5, P@10, Rprecision],
+        eval_metrics=[MAP, P@1, P@5, P@10, "Rprec"],  # correct parameter name
         names=[name]
     )
     results[name] = res
 
+# 1. Concatenate the results into a single DataFrame
 eval_df = pd.concat(results.values())
+
+# 2. Rename columns to match desired plot labels
+eval_df = eval_df.rename(columns={
+    "AP": "map",
+    "P@1": "P_1",
+    "P@5": "P_5",
+    "P@10": "P_10"
+})
+
 print(eval_df)
 
-# ---------------------- Visualisation ----------------------
+# 3. Plot
 import matplotlib.pyplot as plt
-eval_df.set_index("name")[["map", "P_1", "P_5", "P_10", "Rprec"]].plot.bar(
-    figsize=(12, 6), title="Comparaison des modèles et traitements")
+
+metrics = ["map", "P_1", "P_5", "P_10", "Rprec"]
+eval_df.set_index("name")[metrics].plot.bar(
+    figsize=(12, 6),
+    title="Comparaison des modèles et traitements"
+)
 plt.xticks(rotation=45)
 plt.grid(True)
 plt.tight_layout()
